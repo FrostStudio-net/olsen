@@ -1,0 +1,27 @@
+{
+  "name": "olsen-v0.2-btc-eur-hourly",
+  "pair": "XBT/EUR",
+  "interval_minutes": 60,
+  "horizon": 12,
+  "fold_frequency": "quarterly",
+  "label": {
+    "fee_bps_per_fill": 80.0,
+    "slippage_bps_per_fill": 5.0,
+    "classes": ["downside_risk", "no_edge", "buy_opportunity"]
+  },
+  "model": {
+    "type": "hist_gradient_boosting",
+    "calibration": "chronological_holdout",
+    "random_state": 42
+  },
+  "backtest": {
+    "initial_cash": 1000.0,
+    "fee_bps_per_fill": 80.0,
+    "slippage_bps_per_fill": 5.0,
+    "buy_threshold": 0.58,
+    "sell_threshold": 0.48,
+    "max_allocation": 0.25,
+    "sensitivity_fee_bps": [40.0, 80.0, 120.0],
+    "sensitivity_slippage_bps": [0.0, 5.0, 10.0]
+  }
+}

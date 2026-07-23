@@ -1,0 +1,23 @@
+Metadata-Version: 2.4
+Name: olsen
+Version: 0.2.0
+Summary: Kraken-first ML trading research and paper-trading system
+Requires-Python: >=3.11
+Requires-Dist: httpx<1,>=0.27
+Requires-Dist: pandas<3,>=2.2
+Requires-Dist: numpy<3,>=1.26
+Requires-Dist: scikit-learn<2,>=1.5
+Requires-Dist: joblib<2,>=1.4
+Requires-Dist: pydantic-settings<3,>=2.4
+Requires-Dist: typer<1,>=0.12
+Requires-Dist: rich<15,>=13.7
+Provides-Extra: dev
+Requires-Dist: pytest<9,>=8; extra == "dev"
+Requires-Dist: ruff<1,>=0.6; extra == "dev"
+Requires-Dist: fastapi<1,>=0.115; extra == "dev"
+Requires-Dist: uvicorn<1,>=0.30; extra == "dev"
+Requires-Dist: websockets<17,>=13; extra == "dev"
+Provides-Extra: services
+Requires-Dist: fastapi<1,>=0.115; extra == "services"
+Requires-Dist: uvicorn<1,>=0.30; extra == "services"
+Requires-Dist: websockets<17,>=13; extra == "services"
