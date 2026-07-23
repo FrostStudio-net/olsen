@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     max_drawdown_limit: float = 0.15
     walk_forward_frequency: str = "quarterly"
     experiment_config: Path = Path("configs/v0.2.json")
+    history_request_delay: float = 1.05
     db_path: Path = Path("data/olsen.db")
     model_path: Path = Path("models/model.joblib")
 

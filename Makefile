@@ -1,6 +1,6 @@
 install:
-	python3 -m venv .venv
-	.venv/bin/pip install --no-build-isolation -e '.[dev]'
+	python3 -m venv --upgrade-deps .venv
+	.venv/bin/pip install -e '.[dev]'
 
 test:
 	.venv/bin/pytest
@@ -10,6 +10,9 @@ lint:
 
 fetch:
 	.venv/bin/olsen fetch
+
+sync-history:
+	.venv/bin/olsen sync-history
 
 train:
 	.venv/bin/olsen train

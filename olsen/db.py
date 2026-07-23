@@ -19,6 +19,43 @@ CREATE TABLE IF NOT EXISTS candles (
   trades INTEGER NOT NULL,
   PRIMARY KEY (pair, interval_minutes, timestamp)
 );
+CREATE TABLE IF NOT EXISTS market_trades (
+  pair TEXT NOT NULL,
+  trade_id INTEGER NOT NULL,
+  timestamp REAL NOT NULL,
+  price REAL NOT NULL,
+  volume REAL NOT NULL,
+  PRIMARY KEY (pair, trade_id)
+);
+CREATE INDEX IF NOT EXISTS idx_market_trades_timestamp
+  ON market_trades(pair, timestamp);
+CREATE TABLE IF NOT EXISTS history_hour_accumulators (
+  pair TEXT NOT NULL,
+  interval_minutes INTEGER NOT NULL,
+  timestamp INTEGER NOT NULL,
+  open REAL NOT NULL,
+  high REAL NOT NULL,
+  low REAL NOT NULL,
+  close REAL NOT NULL,
+  volume REAL NOT NULL,
+  price_volume REAL NOT NULL,
+  trades INTEGER NOT NULL,
+  first_trade_timestamp REAL NOT NULL,
+  first_trade_id INTEGER NOT NULL,
+  last_trade_timestamp REAL NOT NULL,
+  last_trade_id INTEGER NOT NULL,
+  PRIMARY KEY (pair, interval_minutes, timestamp)
+);
+CREATE TABLE IF NOT EXISTS history_sync_state (
+  pair TEXT NOT NULL,
+  interval_minutes INTEGER NOT NULL,
+  cursor TEXT NOT NULL,
+  status TEXT NOT NULL,
+  batches INTEGER NOT NULL,
+  unique_trades INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL,
+  PRIMARY KEY (pair, interval_minutes)
+);
 CREATE TABLE IF NOT EXISTS paper_state (
   id INTEGER PRIMARY KEY CHECK (id = 1),
   cash REAL NOT NULL,

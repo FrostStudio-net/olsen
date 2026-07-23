@@ -19,9 +19,9 @@ not evidence of profitability and not financial advice.
 
 ```bash
 cd /absolute/path/to/olsen
-python3 -m venv .venv
+python3 -m venv --upgrade-deps .venv
 source .venv/bin/activate
-pip install --no-build-isolation -e '.[dev]'
+pip install -e '.[dev]'
 cp .env.example .env
 pytest
 ruff check .
@@ -30,27 +30,32 @@ ruff check .
 Install optional read-only services separately:
 
 ```bash
-pip install --no-build-isolation -e '.[services]'
+pip install -e '.[services]'
 ```
 
-## Data
+## Automatic historical data
 
-Kraken REST supplies recent data:
+No archive or CSV download is required. One command synchronizes all available Kraken
+BTC/EUR history from market inception through the newest completed hourly candle:
 
 ```bash
-olsen fetch
-olsen status
+olsen sync-history
 ```
 
-For meaningful two-year expanding windows, download Kraken's official historical
-OHLCVT ZIP, extract the 60-minute BTC/EUR CSV, and run:
+Kraken's OHLC endpoint only exposes a recent window, so Olsen pages through the public
+Trades endpoint from its `since` cursor, deduplicates trades by Kraken trade ID, and
+aggregates them into 1-hour candles. Every batch and its next cursor are committed in
+one SQLite transaction. If the process or network is interrupted, running the same
+command resumes from that checkpoint without duplicating trades or candles.
 
-```bash
-olsen import-csv /absolute/path/to/XBTEUR_60.csv
-olsen fetch
-```
+After the deep sync, Olsen reconciles the recent tail with Kraken's native OHLC endpoint,
+excludes the unfinished candle, validates timestamp ordering/alignment and OHLCV bounds,
+and prints the first candle, last candle, candle count, missing intervals, and database
+size. Missing intervals are reported rather than filled because Kraken can legitimately
+have no candle when no trade occurred.
 
-The expected CSV columns are `timestamp,open,high,low,close,volume,trades`.
+`olsen fetch` remains available as a quick recent-window refresh, but it is not a
+historical bootstrap command.
 
 ## Reproducible research workflow
 

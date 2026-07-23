@@ -12,6 +12,7 @@ from .config import settings
 from .db import connect, load_candles, upsert_candles
 from .experiment import load_experiment_config, run_walk_forward
 from .features import build_features
+from .history import HistorySummary, sync_history
 from .kraken import KrakenPublicClient
 from .model import load_model, train_chronological
 from .paper import execute_paper_step, paper_status, reset_paper_account
@@ -42,18 +43,29 @@ def fetch() -> None:
     console.print(f"Stored/updated {changes} candles; received {len(df)} completed candles.")
 
 
-@app.command("import-csv")
-def import_csv(path: Path) -> None:
-    """Import a Kraken OHLCVT CSV: timestamp,open,high,low,close,volume,trades."""
-    df = pd.read_csv(path, header=None)
-    if df.shape[1] < 7:
-        raise typer.BadParameter("Expected at least 7 columns")
-    df = df.iloc[:, :7]
-    df.columns = ["timestamp", "open", "high", "low", "close", "volume", "trades"]
-    df["vwap"] = df["close"]
-    df = df[["timestamp", "open", "high", "low", "close", "vwap", "volume", "trades"]]
-    changes = upsert_candles(settings.db_path, df, settings.pair, settings.interval_minutes)
-    console.print(f"Imported {changes} rows from {path}")
+@app.command("sync-history")
+def sync_history_command() -> None:
+    """Download, resume, reconcile, and verify all available BTC/EUR 1h history."""
+    def show_progress(batch: int, inserted: int, cursor: str) -> None:
+        if batch == 1 or batch % 100 == 0:
+            console.print(
+                f"History batch {batch}: {inserted} new trades; checkpoint {cursor}",
+                highlight=False,
+            )
+
+    summary = sync_history(
+        settings.db_path,
+        settings.pair,
+        settings.rest_pair,
+        settings.interval_minutes,
+        request_delay=settings.history_request_delay,
+        progress=show_progress,
+    )
+    console.print(f"First candle: {HistorySummary.format_timestamp(summary.first_candle)}")
+    console.print(f"Last candle: {HistorySummary.format_timestamp(summary.last_candle)}")
+    console.print(f"Number of candles: {summary.candles:,}")
+    console.print(f"Missing candles: {summary.missing_candles:,}")
+    console.print(f"Database size: {summary.database_size:,} bytes")
 
 
 @app.command()

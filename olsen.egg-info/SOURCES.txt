@@ -10,6 +10,7 @@ olsen/db.py
 olsen/execution.py
 olsen/experiment.py
 olsen/features.py
+olsen/history.py
 olsen/kraken.py
 olsen/model.py
 olsen/paper.py
@@ -20,8 +21,9 @@ olsen.egg-info/dependency_links.txt
 olsen.egg-info/entry_points.txt
 olsen.egg-info/requires.txt
 olsen.egg-info/top_level.txt
-tests/test_features.py
 tests/test_execution.py
+tests/test_features.py
+tests/test_history.py
 tests/test_paper.py
 tests/test_services.py
 tests/test_walk_forward.py

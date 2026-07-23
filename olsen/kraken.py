@@ -36,3 +36,17 @@ class KrakenPublicClient:
         # Kraken includes the current, not-yet-committed candle; exclude it.
         current_bucket = int(time.time() // (interval * 60) * (interval * 60))
         return df[df["timestamp"] < current_bucket].reset_index(drop=True)
+
+    def fetch_trades(
+        self, pair: str, since: str = "0", count: int = 1000
+    ) -> tuple[pd.DataFrame, str]:
+        """Fetch a pageable batch from Kraken's market-inception trade history."""
+        result = self._get("Trades", {"pair": pair, "since": since, "count": count})
+        key = next(key for key in result if key != "last")
+        rows = result[key]
+        columns = ["price", "volume", "timestamp", "side", "order_type", "misc", "trade_id"]
+        frame = pd.DataFrame(rows, columns=columns)
+        if not frame.empty:
+            for column in ("price", "volume", "timestamp", "trade_id"):
+                frame[column] = pd.to_numeric(frame[column])
+        return frame, str(result["last"])
